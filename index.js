@@ -1,15 +1,22 @@
 const express = require("express");
-const app = express();
+const mongodb = require("mongodb");
 const cors = require("cors");
+const env = require("dotenv").config();
+
+const app = express();
 const port = 5000;
 
-const corsOptions = {
-  origin: "*"
-}
-app.use(cors());
+const client = new mongodb.MongoClient(process.env.MONGOURL);
 
-app.post("/create", cors(corsOptions),(req, res) => {
-  console.log(req);
+const corsOptions = {
+  origin: "*",
+};
+
+app.use(cors());
+app.use(express.json());
+
+app.post("/create", cors(corsOptions), (req, res) => {
+  console.log(req.body);
   res.status(200).send();
 });
 
