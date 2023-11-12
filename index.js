@@ -19,16 +19,14 @@ const send_db = async function (url, hash) {
     website: url,
   });
   if (findRes) {
-    console.log("Hash for given link already exists");
-    return 0;
+    return findRes.hash;
   }
   const newDoc = {
     website: url,
     hash: hash,
   };
   const res = await hashCollection.insertOne(newDoc);
-  console.log(`Document inserted with id ${res.insertedId}`);
-  return 1;
+  return hash;
 };
 
 const get_db = async function (hash) {
@@ -54,10 +52,10 @@ const hash_gen = function (length) {
 app.use(cors());
 app.use(express.json());
 
-app.post("/create", cors(corsOptions), (req, res) => {
-  const hash = hash_gen(10)
-  send_db(req.body.target_url, hash);
-  res.json({url: hash}).status(200).send();
+app.post("/create", cors(corsOptions), async (req, res) => {
+  let hash = hash_gen(10);
+  hash = await send_db(req.body.target_url, hash);
+  res.json({ urlhash: hash }).status(200).send();
 });
 app.get("/*", cors(corsOptions), async (req, res) => {
   const req_hash = req.url.trim().substring(1);
