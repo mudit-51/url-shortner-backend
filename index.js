@@ -5,13 +5,16 @@ const crypto = require("crypto");
 const env = require("dotenv").config();
 
 const app = express();
-const port = 5000;
+const port = 8080;
 
 const client = new mongodb.MongoClient(process.env.MONGOURL);
 
 const corsOptions = {
-  origin: "*",
+  origin: "https://mudit-51-url-shortner.netlify.app",
 };
+
+app.use(cors());
+app.use(express.json());
 
 const send_db = async function (url, hash) {
   const hashCollection = await client.db("URLs").collection("Hashes");
@@ -49,21 +52,20 @@ const hash_gen = function (length) {
   return str;
 };
 
-app.use(cors());
-app.use(express.json());
-
 app.post("/create", cors(corsOptions), async (req, res) => {
   let hash = hash_gen(10);
   hash = await send_db(req.body.target_url, hash);
   res.json({ urlhash: hash }).status(200).send();
 });
+
+
 app.get("/*", cors(corsOptions), async (req, res) => {
   const req_hash = req.url.trim().substring(1);
   const x = await get_db(req_hash);
   if (x) {
     res.redirect(x.website);
   } else {
-    res.redirect("http://localhost:3000/error");
+    res.redirect(`${process.env.WEBURL}/error`);
   }
 });
 
