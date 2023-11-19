@@ -10,7 +10,7 @@ const port = 8080;
 const client = new mongodb.MongoClient(process.env.MONGOURL);
 
 const corsOptions = {
-  origin: "https://mudit-51-url-shortner.netlify.app",
+  origin: "*",
 };
 
 app.use(cors());
